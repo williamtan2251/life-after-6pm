@@ -11,8 +11,10 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export function pageview(path: string) {
   if (!GA_ID || typeof window.gtag !== "function") return;
+  const base = window.location.origin + window.location.pathname;
   window.gtag("event", "page_view", {
-    page_path: path,
+    page_location: base + (path === "/" ? "" : path),
+    page_title: document.title,
   });
 }
 
