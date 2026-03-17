@@ -38,14 +38,18 @@ export default function Comments({ journalId }: Props) {
       .from("comments")
       .select("*")
       .eq("journal_id", journalId)
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
     setComments(data ?? []);
     setLoading(false);
   }
 
   async function handleDelete(commentId: string) {
     if (!confirm("Delete this comment?")) return;
-    await supabase.from("comments").delete().eq("id", commentId);
+    const { error } = await supabase.from("comments").delete().eq("id", commentId);
+    if (error) {
+      alert("Failed to delete: " + error.message);
+      return;
+    }
     loadComments();
   }
 
