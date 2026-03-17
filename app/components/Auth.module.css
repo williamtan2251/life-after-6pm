@@ -59,13 +59,3 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
-
-.toggleButton {
-  padding: 4px;
-  background: none;
-  border: none;
-  color: #888;
-  cursor: pointer;
-  font-size: 13px;
-  text-decoration: underline;
-}

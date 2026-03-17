@@ -9,7 +9,6 @@ export default function Auth() {
   const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -32,9 +31,10 @@ export default function Auth() {
     setError("");
     setLoading(true);
 
-    const { error } = isSignUp
-      ? await supabase.auth.signUp({ email, password })
-      : await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     if (error) {
       setError(error.message);
@@ -63,14 +63,7 @@ export default function Auth() {
       />
       {error && <p className={styles.error}>{error}</p>}
       <button type="submit" disabled={loading} className={styles.submitButton}>
-        {loading ? "..." : isSignUp ? "Sign up" : "Sign in"}
-      </button>
-      <button
-        type="button"
-        onClick={() => setIsSignUp(!isSignUp)}
-        className={styles.toggleButton}
-      >
-        {isSignUp ? "Have an account? Sign in" : "Need an account? Sign up"}
+        {loading ? "..." : "Sign in"}
       </button>
     </form>
   );
