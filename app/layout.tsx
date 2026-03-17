@@ -16,6 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Life After 6PM",
   description: "A personal journal",
+  icons: {
+    icon: "/life-after-6pm/favicon.svg",
+  },
 };
 
 export default function RootLayout({

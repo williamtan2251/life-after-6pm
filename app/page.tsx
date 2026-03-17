@@ -68,6 +68,7 @@ export default function Home() {
           onClick={() => navigate({ kind: "list" })}
           className={styles.title}
         >
+          <img src="/life-after-6pm/favicon.svg" alt="" className={styles.titleIcon} />
           Life After 6PM
         </button>
         <div className={styles.headerRight}>
