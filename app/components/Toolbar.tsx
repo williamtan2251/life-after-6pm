@@ -120,7 +120,16 @@ export default function Toolbar({ editor }: ToolbarProps) {
         onClick={() => {
           const url = prompt("Image URL:");
           if (url) {
-            editor.chain().focus().setImage({ src: url }).run();
+            try {
+              const parsed = new URL(url);
+              if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+                alert("Only http and https URLs are allowed.");
+                return;
+              }
+              editor.chain().focus().setImage({ src: parsed.href }).run();
+            } catch {
+              alert("Invalid URL.");
+            }
           }
         }}
         title="Insert image"

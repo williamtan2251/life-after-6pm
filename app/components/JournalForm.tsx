@@ -66,7 +66,8 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
           preview: extractPreview(content),
           updated_at: new Date().toISOString(),
         })
-        .eq("id", editId);
+        .eq("id", editId)
+        .eq("author_id", user.id);
 
       if (error) {
         alert(error.message);

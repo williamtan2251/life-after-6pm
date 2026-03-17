@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import styles from "./Comments.module.css";
+
+const RATE_LIMIT_MS = 30_000;
 
 interface Comment {
   id: string;
@@ -23,6 +25,7 @@ export default function Comments({ journalId }: Props) {
   const [email, setEmail] = useState("");
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const lastSubmitRef = useRef(0);
 
   useEffect(() => {
     loadComments();
@@ -41,7 +44,15 @@ export default function Comments({ journalId }: Props) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim() || !email.trim() || !body.trim()) return;
+
+    const now = Date.now();
+    if (now - lastSubmitRef.current < RATE_LIMIT_MS) {
+      alert("Please wait before posting another comment.");
+      return;
+    }
+
     setSubmitting(true);
+    lastSubmitRef.current = now;
 
     const { error } = await supabase.from("comments").insert({
       journal_id: journalId,

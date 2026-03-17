@@ -53,7 +53,8 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
 
   async function handleDelete() {
     if (!confirm("Delete this entry?")) return;
-    await supabase.from("journals").delete().eq("id", id);
+    if (!user) return;
+    await supabase.from("journals").delete().eq("id", id).eq("author_id", user.id);
     onBack();
   }
 
