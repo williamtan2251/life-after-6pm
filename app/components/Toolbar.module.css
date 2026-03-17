@@ -1,0 +1,38 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: var(--background);
+}
+
+.toolbar button {
+  padding: 4px 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  color: var(--foreground);
+  cursor: pointer;
+  font-size: 13px;
+  font-family: var(--font-mono), monospace;
+  line-height: 1.4;
+}
+
+.toolbar button:hover {
+  background: rgba(128, 128, 128, 0.15);
+}
+
+.active {
+  background: rgba(128, 128, 128, 0.25) !important;
+  border-color: #555 !important;
+}
+
+.divider {
+  width: 1px;
+  align-self: stretch;
+  background: #333;
+  margin: 0 4px;
+}
