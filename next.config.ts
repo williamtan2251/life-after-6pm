@@ -63,6 +63,7 @@ const transpilePackages = [
 ];
 
 const nextConfig: NextConfig = {
+  basePath: "/life-after-6pm",
   output: "export",
   images: { unoptimized: true },
   typescript: { ignoreBuildErrors: true },
