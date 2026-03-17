@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth-context";
 import styles from "./Auth.module.css";
@@ -11,6 +11,20 @@ export default function Auth() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => document.removeEventListener("mousedown", handleClickOutside);
+    }
+  }, [open]);
 
   if (user) {
     return (
@@ -42,7 +56,7 @@ export default function Auth() {
     setLoading(false);
   }
 
-  return (
+  const formContent = (
     <form onSubmit={handleSubmit} className={styles.form}>
       <input
         type="email"
@@ -66,5 +80,22 @@ export default function Auth() {
         {loading ? "..." : "Sign in"}
       </button>
     </form>
+  );
+
+  return (
+    <div className={styles.authWrapper} ref={dropdownRef}>
+      <div className={styles.desktopForm}>{formContent}</div>
+      <div className={styles.mobileDropdown}>
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          className={styles.mobileToggle}
+          aria-label="Sign in"
+        >
+          Sign in
+        </button>
+        {open && <div className={styles.dropdownPanel}>{formContent}</div>}
+      </div>
+    </div>
   );
 }
