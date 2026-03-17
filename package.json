@@ -12,6 +12,7 @@
     "@supabase/supabase-js": "^2.99.2",
     "@tiptap/extension-code-block": "^3.20.3",
     "@tiptap/extension-horizontal-rule": "^3.20.3",
+    "@tiptap/extension-image": "^3.20.3",
     "@tiptap/pm": "^3.20.3",
     "@tiptap/react": "^3.20.3",
     "@tiptap/starter-kit": "^3.20.3",

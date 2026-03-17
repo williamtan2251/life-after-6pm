@@ -2,6 +2,7 @@
 
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import Image from "@tiptap/extension-image";
 import type { JSONContent } from "@tiptap/react";
 import Toolbar from "./Toolbar";
 import styles from "./Editor.module.css";
@@ -18,7 +19,7 @@ export default function Editor({
   editable = true,
 }: EditorProps) {
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, Image],
     content,
     editable,
     immediatelyRender: false,
