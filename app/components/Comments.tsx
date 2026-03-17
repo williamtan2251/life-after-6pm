@@ -49,7 +49,8 @@ export default function Comments({ journalId }: Props) {
     loadComments();
   }
 
-  const effectiveName = user ? (name.trim() || user.email?.split("@")[0] ?? "Author") : name.trim();
+  const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Author";
+  const effectiveName = user ? (name.trim() || displayName) : name.trim();
   const effectiveEmail = user ? (user.email ?? "") : email.trim();
 
   async function handleSubmit(e: React.FormEvent) {
@@ -127,16 +128,7 @@ export default function Comments({ journalId }: Props) {
 
       <form onSubmit={handleSubmit} className={styles.form}>
         {user ? (
-          <div className={styles.loggedInRow}>
-            <p className={styles.commentAs}>Commenting as {user.email}</p>
-            <input
-              type="text"
-              placeholder="Display name (optional)"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className={styles.input}
-            />
-          </div>
+          <p className={styles.commentAs}>Commenting as {displayName}</p>
         ) : (
           <div className={styles.formRow}>
             <input
