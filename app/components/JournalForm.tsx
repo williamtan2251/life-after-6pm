@@ -83,6 +83,7 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
           content,
           preview: extractPreview(content),
           author_id: user.id,
+          author_name: user.email?.split("@")[0] ?? "Author",
         })
         .select("id")
         .single();

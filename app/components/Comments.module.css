@@ -37,9 +37,41 @@
   margin-bottom: 6px;
 }
 
+.commentMeta {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
 .commentDate {
   font-size: 12px;
   color: #888;
+}
+
+.deleteButton {
+  background: none;
+  border: none;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.deleteButton:hover {
+  color: #e55;
+}
+
+.loggedInRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.commentAs {
+  margin: 0;
+  font-size: 13px;
+  color: #888;
+  white-space: nowrap;
 }
 
 .commentBody {

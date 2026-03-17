@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { useAuth } from "../lib/auth-context";
 import styles from "./Comments.module.css";
 
 const RATE_LIMIT_MS = 30_000;
@@ -19,6 +20,7 @@ interface Props {
 }
 
 export default function Comments({ journalId }: Props) {
+  const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [name, setName] = useState("");
@@ -41,9 +43,18 @@ export default function Comments({ journalId }: Props) {
     setLoading(false);
   }
 
+  async function handleDelete(commentId: string) {
+    if (!confirm("Delete this comment?")) return;
+    await supabase.from("comments").delete().eq("id", commentId);
+    loadComments();
+  }
+
+  const effectiveName = user ? (name.trim() || user.email?.split("@")[0] ?? "Author") : name.trim();
+  const effectiveEmail = user ? (user.email ?? "") : email.trim();
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !body.trim()) return;
+    if (!effectiveName || !effectiveEmail || !body.trim()) return;
 
     const now = Date.now();
     if (now - lastSubmitRef.current < RATE_LIMIT_MS) {
@@ -56,8 +67,8 @@ export default function Comments({ journalId }: Props) {
 
     const { error } = await supabase.from("comments").insert({
       journal_id: journalId,
-      name: name.trim(),
-      email: email.trim(),
+      name: effectiveName,
+      email: effectiveEmail,
       body: body.trim(),
     });
 
@@ -88,15 +99,25 @@ export default function Comments({ journalId }: Props) {
             <li key={c.id} className={styles.comment}>
               <div className={styles.commentHeader}>
                 <strong>{c.name}</strong>
-                <time className={styles.commentDate}>
-                  {new Date(c.created_at).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "numeric",
-                    minute: "2-digit",
-                  })}
-                </time>
+                <div className={styles.commentMeta}>
+                  <time className={styles.commentDate}>
+                    {new Date(c.created_at).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}
+                  </time>
+                  {user && (
+                    <button
+                      className={styles.deleteButton}
+                      onClick={() => handleDelete(c.id)}
+                    >
+                      Delete
+                    </button>
+                  )}
+                </div>
               </div>
               <p className={styles.commentBody}>{c.body}</p>
             </li>
@@ -105,24 +126,37 @@ export default function Comments({ journalId }: Props) {
       )}
 
       <form onSubmit={handleSubmit} className={styles.form}>
-        <div className={styles.formRow}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className={styles.input}
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className={styles.input}
-          />
-        </div>
+        {user ? (
+          <div className={styles.loggedInRow}>
+            <p className={styles.commentAs}>Commenting as {user.email}</p>
+            <input
+              type="text"
+              placeholder="Display name (optional)"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className={styles.input}
+            />
+          </div>
+        ) : (
+          <div className={styles.formRow}>
+            <input
+              type="text"
+              placeholder="Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className={styles.input}
+            />
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className={styles.input}
+            />
+          </div>
+        )}
         <textarea
           placeholder="Write a comment..."
           value={body}
@@ -133,7 +167,7 @@ export default function Comments({ journalId }: Props) {
         />
         <button
           type="submit"
-          disabled={submitting || !name.trim() || !email.trim() || !body.trim()}
+          disabled={submitting || !effectiveName || !effectiveEmail || !body.trim()}
           className={styles.submitButton}
         >
           {submitting ? "Posting..." : "Post Comment"}

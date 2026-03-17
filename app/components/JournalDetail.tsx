@@ -15,6 +15,7 @@ interface Journal {
   content: JSONContent;
   created_at: string;
   author_id: string;
+  author_name?: string;
 }
 
 interface Props {
@@ -85,6 +86,7 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
             hour: "numeric",
             minute: "2-digit",
           })}
+          {journal.author_name && ` | ${journal.author_name}`}
         </time>
         {isAuthor && (
           <div className={styles.actions}>
