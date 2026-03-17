@@ -94,6 +94,15 @@ export default function Toolbar({ editor }: ToolbarProps) {
         1. List
       </button>
 
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        className={editor.isActive("blockquote") ? styles.active : ""}
+        title="Blockquote"
+      >
+        &ldquo;&rdquo;
+      </button>
+
       <span className={styles.divider} />
 
       <button

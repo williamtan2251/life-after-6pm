@@ -84,6 +84,24 @@
   margin: 0.5em 0;
 }
 
+.editor :global(.tiptap) blockquote,
+.readOnly :global(.tiptap) blockquote {
+  border-left: 3px solid #f5a623;
+  margin: 1.5em 0;
+  padding: 1em 1.5em;
+  background: rgba(245, 166, 35, 0.06);
+  border-radius: 0 6px 6px 0;
+  font-style: italic;
+  font-size: 1.1em;
+  color: inherit;
+  opacity: 0.9;
+}
+
+.editor :global(.tiptap) blockquote p,
+.readOnly :global(.tiptap) blockquote p {
+  margin: 0;
+}
+
 .editor :global(.tiptap) hr,
 .readOnly :global(.tiptap) hr {
   border: none;
