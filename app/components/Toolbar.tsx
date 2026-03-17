@@ -103,6 +103,21 @@ export default function Toolbar({ editor }: ToolbarProps) {
       >
         &mdash;
       </button>
+
+      <span className={styles.divider} />
+
+      <button
+        type="button"
+        onClick={() => {
+          const url = prompt("Image URL:");
+          if (url) {
+            editor.chain().focus().setImage({ src: url }).run();
+          }
+        }}
+        title="Insert image"
+      >
+        IMG
+      </button>
     </div>
   );
 }
