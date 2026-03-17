@@ -95,4 +95,21 @@ CREATE POLICY "author_delete" ON journals
   FOR DELETE USING (auth.uid() = author_id);
 
 ALTER TABLE journals ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE comments (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  journal_id UUID REFERENCES journals(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  body TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
+CREATE POLICY "public_read_comments" ON comments
+  FOR SELECT USING (true);
+
+CREATE POLICY "public_insert_comments" ON comments
+  FOR INSERT WITH CHECK (true);
+
+ALTER TABLE comments ENABLE ROW LEVEL SECURITY;
 ```

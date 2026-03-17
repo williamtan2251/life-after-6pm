@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth-context";
 import Editor from "./Editor";
+import Comments from "./Comments";
 import type { JSONContent } from "@tiptap/react";
 import styles from "./JournalDetail.module.css";
 
@@ -84,6 +85,8 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
       <article className={styles.content}>
         <Editor content={journal.content} editable={false} />
       </article>
+
+      <Comments journalId={id} />
     </div>
   );
 }
