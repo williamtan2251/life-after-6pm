@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth-context";
-import { trackScrollDepth, trackReadTime } from "../lib/analytics";
+import { trackScrollDepth, trackReadTime, setPageTitle, pageview } from "../lib/analytics";
 import Editor from "./Editor";
 import Comments from "./Comments";
 import type { JSONContent } from "@tiptap/react";
@@ -40,6 +40,12 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
         setLoading(false);
       });
   }, [id]);
+
+  useEffect(() => {
+    if (!journal) return;
+    setPageTitle(journal.title);
+    pageview(`/#journal/${journal.id}`);
+  }, [journal]);
 
   useEffect(() => {
     if (!journal || !rootRef.current) return;

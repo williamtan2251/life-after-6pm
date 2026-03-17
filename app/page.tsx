@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./lib/auth-context";
-import { pageview, event } from "./lib/analytics";
+import { pageview, event, setPageTitle } from "./lib/analytics";
 import Auth from "./components/Auth";
 import JournalList from "./components/JournalList";
 import JournalDetail from "./components/JournalDetail";
@@ -40,6 +40,8 @@ export default function Home() {
   useEffect(() => {
     const initial = parseHash(window.location.hash);
     setView(initial);
+    if (initial.kind === "new") setPageTitle("New Entry");
+    else if (initial.kind !== "detail" && initial.kind !== "edit") setPageTitle();
     pageview(window.location.hash ? `/${window.location.hash}` : "/");
   }, []);
 
@@ -62,6 +64,7 @@ export default function Home() {
       // Remove hash without adding history entry for going home
       history.replaceState(null, "", window.location.pathname);
       setView(v);
+      setPageTitle();
       pageview("/");
     }
   }, []);

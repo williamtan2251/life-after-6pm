@@ -8,12 +8,20 @@ declare global {
 }
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
+const SITE_NAME = "Life After 6PM";
+
+export function setPageTitle(title?: string) {
+  document.title = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
+}
 
 export function pageview(path: string) {
   if (!GA_ID || typeof window.gtag !== "function") return;
-  const base = window.location.origin + window.location.pathname;
+  // GA4 strips hash fragments from page_location, so we convert
+  // the hash route into a virtual path: /#journal/abc → /journal/abc
+  const hashPath = path.replace(/^\/#?/, "/").replace(/\/+/g, "/");
+  const base = window.location.origin + window.location.pathname.replace(/\/$/, "");
   window.gtag("event", "page_view", {
-    page_location: base + (path === "/" ? "" : path),
+    page_location: base + hashPath,
     page_title: document.title,
   });
 }
