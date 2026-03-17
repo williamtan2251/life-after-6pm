@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth-context";
+import { event } from "../lib/analytics";
 import styles from "./Auth.module.css";
 
 export default function Auth() {
@@ -44,6 +45,7 @@ export default function Auth() {
     e.preventDefault();
     setError("");
     setLoading(true);
+    event("sign_in_attempt");
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -52,6 +54,8 @@ export default function Auth() {
 
     if (error) {
       setError(error.message);
+    } else {
+      event("sign_in_success");
     }
     setLoading(false);
   }

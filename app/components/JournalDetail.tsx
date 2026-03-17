@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../lib/auth-context";
+import { trackScrollDepth, trackReadTime } from "../lib/analytics";
 import Editor from "./Editor";
 import Comments from "./Comments";
 import type { JSONContent } from "@tiptap/react";
@@ -26,6 +27,7 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
   const { user } = useAuth();
   const [journal, setJournal] = useState<Journal | null>(null);
   const [loading, setLoading] = useState(true);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     supabase
@@ -39,6 +41,16 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
       });
   }, [id]);
 
+  useEffect(() => {
+    if (!journal || !rootRef.current) return;
+    return trackScrollDepth(rootRef.current, journal.id);
+  }, [journal]);
+
+  useEffect(() => {
+    if (!journal) return;
+    return trackReadTime(journal.id);
+  }, [journal]);
+
   async function handleDelete() {
     if (!confirm("Delete this entry?")) return;
     await supabase.from("journals").delete().eq("id", id);
@@ -51,7 +63,7 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
   const isAuthor = user?.id === journal.author_id;
 
   return (
-    <div>
+    <div ref={rootRef}>
       <button onClick={onBack} className={styles.back}>
         &larr; Back
       </button>

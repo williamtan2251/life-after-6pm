@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "./lib/auth-context";
+import { pageview, event } from "./lib/analytics";
 import Auth from "./components/Auth";
 import JournalList from "./components/JournalList";
 import JournalDetail from "./components/JournalDetail";
@@ -37,13 +38,16 @@ export default function Home() {
 
   // Read initial hash on mount
   useEffect(() => {
-    setView(parseHash(window.location.hash));
+    const initial = parseHash(window.location.hash);
+    setView(initial);
+    pageview(window.location.hash ? `/${window.location.hash}` : "/");
   }, []);
 
   // Listen for back/forward navigation
   useEffect(() => {
     function onHashChange() {
       setView(parseHash(window.location.hash));
+      pageview(window.location.hash ? `/${window.location.hash}` : "/");
     }
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
@@ -58,6 +62,7 @@ export default function Home() {
       // Remove hash without adding history entry for going home
       history.replaceState(null, "", window.location.pathname);
       setView(v);
+      pageview("/");
     }
   }, []);
 
@@ -74,7 +79,10 @@ export default function Home() {
         <div className={styles.headerRight}>
           {user && view.kind === "list" && (
             <button
-              onClick={() => navigate({ kind: "new" })}
+              onClick={() => {
+                event("new_entry_click");
+                navigate({ kind: "new" });
+              }}
               className={styles.newButton}
             >
               + New Entry

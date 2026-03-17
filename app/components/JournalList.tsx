@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { event } from "../lib/analytics";
 import styles from "./JournalList.module.css";
 
 interface Journal {
@@ -39,7 +40,10 @@ export default function JournalList({ onSelect }: Props) {
       {journals.map((journal) => (
         <li key={journal.id}>
           <button
-            onClick={() => onSelect(journal.id)}
+            onClick={() => {
+              event("entry_select", { journal_id: journal.id });
+              onSelect(journal.id);
+            }}
             className={styles.entry}
           >
             <time className={styles.date}>
