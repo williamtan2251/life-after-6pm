@@ -68,9 +68,9 @@ Deno.serve(async (req) => {
   try {
     const { message, history } = await req.json();
 
-    if (!message || typeof message !== "string") {
+    if (!message || typeof message !== "string" || message.length > 500) {
       return new Response(
-        JSON.stringify({ error: "Missing 'message' field" }),
+        JSON.stringify({ error: "Missing or invalid 'message' field (max 500 chars)" }),
         { status: 400, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
       );
     }
