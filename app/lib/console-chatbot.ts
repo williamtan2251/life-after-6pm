@@ -43,6 +43,8 @@ async function irc(message: string): Promise<void> {
     history.push({ role: "user", content: message });
     history.push({ role: "assistant", content: data.reply });
 
+    event("console_chat", { message_count: String(history.length / 2) });
+
     console.log(`%c🤖 ${data.reply}`, styles.bot);
 
     if (data.email) {
