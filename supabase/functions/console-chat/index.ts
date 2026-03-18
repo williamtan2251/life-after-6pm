@@ -5,6 +5,7 @@
 // CREATE TABLE console_leads (
 //   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 //   email TEXT NOT NULL UNIQUE,
+//   message TEXT,
 //   created_at TIMESTAMPTZ DEFAULT now()
 // );
 // ALTER TABLE console_leads ENABLE ROW LEVEL SECURITY;

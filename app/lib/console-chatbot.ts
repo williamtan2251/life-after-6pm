@@ -50,7 +50,7 @@ async function irc(message: string): Promise<void> {
     if (data.email) {
       try {
         await supabase.from("console_leads").upsert(
-          { email: data.email },
+          { email: data.email, message: message || null },
           { onConflict: "email" }
         );
         event("console_email_capture", { email: data.email });
