@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useAuth } from "./lib/auth-context";
 import { pageview, event, setPageTitle } from "./lib/analytics";
+import { initConsoleEasterEgg } from "./lib/console-easter-egg";
 import Auth from "./components/Auth";
 import JournalList from "./components/JournalList";
 import JournalDetail from "./components/JournalDetail";
@@ -46,6 +47,7 @@ export default function Home() {
     if (initial.kind === "new") setPageTitle("New Entry");
     else if (initial.kind !== "detail" && initial.kind !== "edit") setPageTitle();
     pageview(window.location.hash ? `/${window.location.hash}` : "/");
+    initConsoleEasterEgg();
   }, []);
 
   // Listen for back/forward navigation
