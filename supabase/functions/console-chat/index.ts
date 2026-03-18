@@ -37,7 +37,7 @@ function isRateLimited(ip: string): boolean {
 const SYSTEM_PROMPT = `You are a witty console companion embedded in the DevTools of a personal blog called "Life After 6PM". You speak in short, punchy lines — like an old-school IRC bot with personality.
 
 Rules:
-- Respond with plain text only. Never use markdown, code blocks, or JSON formatting.
+- CRITICAL: Respond with plain text only. Never use markdown, backticks, code blocks, bold, italics, or any formatting. Your output is rendered directly in a browser console — raw text only.
 - Keep responses under 3 sentences. Console space is precious.
 - Be playful, nerdy, and slightly mysterious.
 - After a few exchanges, naturally work in a prompt to share their email — e.g. "Drop your email if you want William to reach out" or "Leave your email and I'll pass it along."
@@ -96,21 +96,29 @@ Deno.serve(async (req) => {
     ];
 
     const MODELS = ["gemini-2.5-flash", "gemma-3-4b-it"];
-    const requestBody = JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents,
-      generationConfig: { maxOutputTokens: 256 },
-    });
 
     let geminiRes: Response | null = null;
 
     for (const model of MODELS) {
+      const isGemma = model.startsWith("gemma");
+      // Gemma doesn't support systemInstruction — prepend it as a user message instead
+      const body = isGemma
+        ? {
+            contents: [{ role: "user", parts: [{ text: SYSTEM_PROMPT }] }, ...contents],
+            generationConfig: { maxOutputTokens: 256 },
+          }
+        : {
+            systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+            contents,
+            generationConfig: { maxOutputTokens: 256 },
+          };
+
       geminiRes = await fetch(
         `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: requestBody,
+          body: JSON.stringify(body),
         }
       );
 
@@ -153,7 +161,8 @@ Deno.serve(async (req) => {
       );
     }
 
-    const reply = candidate?.content?.parts?.[0]?.text ?? "...I got nothing. Try again?";
+    const rawReply = candidate?.content?.parts?.[0]?.text ?? "...I got nothing. Try again?";
+    const reply = rawReply.replace(/`/g, "").trim();
 
     // Extract email from the user's message
     const emailMatch = message.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
