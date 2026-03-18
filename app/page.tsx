@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Image from "next/image";
 import { useAuth } from "./lib/auth-context";
 import { pageview, event, setPageTitle } from "./lib/analytics";
 import Auth from "./components/Auth";
@@ -34,15 +35,17 @@ function viewToHash(view: View): string {
 
 export default function Home() {
   const { user } = useAuth();
-  const [view, setView] = useState<View>({ kind: "list" });
+  const [view, setView] = useState<View>(() => {
+    if (typeof window === "undefined") return { kind: "list" };
+    return parseHash(window.location.hash);
+  });
 
-  // Read initial hash on mount
+  // Track initial pageview on mount
   useEffect(() => {
-    const initial = parseHash(window.location.hash);
-    setView(initial);
-    if (initial.kind === "new") setPageTitle("New Entry");
-    else if (initial.kind !== "detail" && initial.kind !== "edit") setPageTitle();
+    if (view.kind === "new") setPageTitle("New Entry");
+    else if (view.kind !== "detail" && view.kind !== "edit") setPageTitle();
     pageview(window.location.hash ? `/${window.location.hash}` : "/");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Listen for back/forward navigation
@@ -76,7 +79,7 @@ export default function Home() {
           onClick={() => navigate({ kind: "list" })}
           className={styles.title}
         >
-          <img src="/life-after-6pm/favicon.svg" alt="" className={styles.titleIcon} />
+          <Image src="/life-after-6pm/favicon.svg" alt="" width={24} height={24} className={styles.titleIcon} />
           Life After 6PM
         </button>
         <div className={styles.headerRight}>

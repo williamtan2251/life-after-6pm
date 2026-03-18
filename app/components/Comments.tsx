@@ -6,6 +6,8 @@ import { useAuth } from "../lib/auth-context";
 import styles from "./Comments.module.css";
 
 const RATE_LIMIT_MS = 30_000;
+const MAX_COMMENT_LENGTH = 2000;
+const MAX_NAME_LENGTH = 100;
 
 interface Comment {
   id: string;
@@ -23,34 +25,46 @@ export default function Comments({ journalId }: Props) {
   const { user } = useAuth();
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const lastSubmitRef = useRef(0);
 
-  useEffect(() => {
-    loadComments();
-  }, [journalId]);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  async function loadComments() {
-    const { data } = await supabase
+  useEffect(() => {
+    let stale = false;
+    supabase
       .from("comments")
       .select("*")
       .eq("journal_id", journalId)
-      .order("created_at", { ascending: false });
-    setComments(data ?? []);
-    setLoading(false);
-  }
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (stale) return;
+        if (error) {
+          setError("Failed to load comments.");
+        } else {
+          setComments(data ?? []);
+        }
+        setLoading(false);
+      });
+    return () => { stale = true; };
+  }, [journalId, refreshKey]);
 
   async function handleDelete(commentId: string) {
     if (!confirm("Delete this comment?")) return;
+    setDeletingId(commentId);
     const { error } = await supabase.from("comments").delete().eq("id", commentId);
     if (error) {
       alert("Failed to delete: " + error.message);
+      setDeletingId(null);
       return;
     }
-    loadComments();
+    setDeletingId(null);
+    setRefreshKey((k) => k + 1);
   }
 
   const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Author";
@@ -85,7 +99,7 @@ export default function Comments({ journalId }: Props) {
 
     setBody("");
     setSubmitting(false);
-    loadComments();
+    setRefreshKey((k) => k + 1);
   }
 
   return (
@@ -96,6 +110,8 @@ export default function Comments({ journalId }: Props) {
 
       {loading ? (
         <p className={styles.empty}>Loading...</p>
+      ) : error ? (
+        <p className={styles.empty}>{error}</p>
       ) : comments.length === 0 ? (
         <p className={styles.empty}>No comments yet. Be the first!</p>
       ) : (
@@ -118,8 +134,10 @@ export default function Comments({ journalId }: Props) {
                     <button
                       className={styles.deleteButton}
                       onClick={() => handleDelete(c.id)}
+                      disabled={deletingId === c.id}
+                      style={{ opacity: deletingId === c.id ? 0.5 : 1 }}
                     >
-                      Delete
+                      {deletingId === c.id ? "Deleting..." : "Delete"}
                     </button>
                   )}
                 </div>
@@ -135,15 +153,20 @@ export default function Comments({ journalId }: Props) {
           <p className={styles.commentAs}>Commenting as {displayName}</p>
         ) : (
           <div className={styles.formRow}>
+            <label className={styles.srOnly} htmlFor="comment-name">Name</label>
             <input
+              id="comment-name"
               type="text"
               placeholder="Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
+              maxLength={MAX_NAME_LENGTH}
               className={styles.input}
             />
+            <label className={styles.srOnly} htmlFor="comment-email">Email</label>
             <input
+              id="comment-email"
               type="email"
               placeholder="Email"
               value={email}
@@ -153,12 +176,15 @@ export default function Comments({ journalId }: Props) {
             />
           </div>
         )}
+        <label className={styles.srOnly} htmlFor="comment-body">Comment</label>
         <textarea
+          id="comment-body"
           placeholder="Write a comment..."
           value={body}
           onChange={(e) => setBody(e.target.value)}
           required
           rows={3}
+          maxLength={MAX_COMMENT_LENGTH}
           className={styles.textarea}
         />
         <button

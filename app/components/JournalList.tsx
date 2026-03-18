@@ -19,19 +19,25 @@ interface Props {
 export default function JournalList({ onSelect }: Props) {
   const [journals, setJournals] = useState<Journal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
       .from("journals")
       .select("id, title, preview, created_at")
       .order("created_at", { ascending: false })
-      .then(({ data }) => {
-        setJournals(data ?? []);
+      .then(({ data, error }) => {
+        if (error) {
+          setError("Failed to load journals.");
+        } else {
+          setJournals(data ?? []);
+        }
         setLoading(false);
       });
   }, []);
 
   if (loading) return <p className={styles.empty}>Loading...</p>;
+  if (error) return <p className={styles.empty}>{error}</p>;
   if (journals.length === 0)
     return <p className={styles.empty}>No journal entries yet.</p>;
 

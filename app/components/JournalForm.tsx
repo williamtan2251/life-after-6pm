@@ -32,6 +32,7 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
   );
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(!!editId);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!editId) return;
@@ -40,8 +41,10 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
       .select("*")
       .eq("id", editId)
       .single()
-      .then(({ data }) => {
-        if (data) {
+      .then(({ data, error }) => {
+        if (error) {
+          setError("Failed to load journal entry.");
+        } else if (data) {
           setTitle(data.title);
           setInitialContent(data.content);
           setContent(data.content);
@@ -52,6 +55,7 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
 
   if (!user) return <p>Please sign in.</p>;
   if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
 
   async function handleSave() {
     if (!title.trim() || !content || !user) return;
@@ -107,11 +111,14 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
         {editId ? "Edit Entry" : "New Entry"}
       </h1>
 
+      <label htmlFor="journal-title" className={styles.srOnly}>Title</label>
       <input
+        id="journal-title"
         type="text"
         placeholder="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        maxLength={200}
         className={styles.titleInput}
       />
 

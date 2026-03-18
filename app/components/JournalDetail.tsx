@@ -26,20 +26,35 @@ interface Props {
 
 export default function JournalDetail({ id, onBack, onEdit }: Props) {
   const { user } = useAuth();
+  const [fetchedId, setFetchedId] = useState<string | null>(null);
   const [journal, setJournal] = useState<Journal | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
 
+  const loading = fetchedId !== id;
+
   useEffect(() => {
+    let stale = false;
+
     supabase
       .from("journals")
       .select("*")
       .eq("id", id)
       .single()
-      .then(({ data }) => {
-        setJournal(data);
-        setLoading(false);
+      .then(({ data, error }) => {
+        if (stale) return;
+        if (error) {
+          setError("Failed to load journal entry.");
+          setJournal(null);
+        } else {
+          setError(null);
+          setJournal(data);
+        }
+        setFetchedId(id);
       });
+
+    return () => { stale = true; };
   }, [id]);
 
   useEffect(() => {
@@ -61,11 +76,18 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
   async function handleDelete() {
     if (!confirm("Delete this entry?")) return;
     if (!user) return;
-    await supabase.from("journals").delete().eq("id", id).eq("author_id", user.id);
+    setDeleting(true);
+    const { error } = await supabase.from("journals").delete().eq("id", id).eq("author_id", user.id);
+    if (error) {
+      alert("Failed to delete: " + error.message);
+      setDeleting(false);
+      return;
+    }
     onBack();
   }
 
   if (loading) return <p>Loading...</p>;
+  if (error) return <p>{error}</p>;
   if (!journal) return <p>Not found.</p>;
 
   const isAuthor = user?.id === journal.author_id;
@@ -96,8 +118,13 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
             >
               Edit
             </button>
-            <button onClick={handleDelete} className={styles.deleteButton}>
-              Delete
+            <button
+              onClick={handleDelete}
+              disabled={deleting}
+              className={styles.deleteButton}
+              style={{ opacity: deleting ? 0.5 : 1 }}
+            >
+              {deleting ? "Deleting..." : "Delete"}
             </button>
           </div>
         )}
