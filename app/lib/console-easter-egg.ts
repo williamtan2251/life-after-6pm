@@ -1,3 +1,5 @@
+import { event } from "./analytics";
+
 export function initConsoleEasterEgg() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="80" viewBox="0 0 500 80">
   <style>
@@ -17,6 +19,8 @@ export function initConsoleEasterEgg() {
     "%c ",
     `background-image: url('${dataUrl}'); padding: 40px 250px; background-size: 500px 80px; background-repeat: no-repeat; background-position: center;`
   );
+
+  event("console_easter_egg");
 
   console.log(
     "%c ⚡ I knew you will look at console! ⚡",
