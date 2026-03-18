@@ -1,4 +1,5 @@
 import { event } from "./analytics";
+import { initConsoleChatbot } from "./console-chatbot";
 
 export function initConsoleEasterEgg() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="80" viewBox="0 0 500 80">
@@ -33,4 +34,11 @@ export function initConsoleEasterEgg() {
     `%c╔${border}╗\n║ ${msg} ║\n╚${border}╝`,
     "color: #1E90FF; font-size: 13px; font-family: monospace;"
   );
+
+  console.log(
+    "%c💬 Type irc('hello') to talk to me!",
+    "color: #FFD700; font-size: 14px; font-weight: bold; padding: 4px 0;"
+  );
+
+  initConsoleChatbot();
 }
