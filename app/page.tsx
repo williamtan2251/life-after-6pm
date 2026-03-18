@@ -35,17 +35,17 @@ function viewToHash(view: View): string {
 
 export default function Home() {
   const { user } = useAuth();
-  const [view, setView] = useState<View>(() => {
-    if (typeof window === "undefined") return { kind: "list" };
-    return parseHash(window.location.hash);
-  });
+  const [view, setView] = useState<View>({ kind: "list" });
+  const [mounted, setMounted] = useState(false);
 
-  // Track initial pageview on mount
+  // Read initial hash on mount — must happen in effect to avoid hydration mismatch
   useEffect(() => {
-    if (view.kind === "new") setPageTitle("New Entry");
-    else if (view.kind !== "detail" && view.kind !== "edit") setPageTitle();
+    const initial = parseHash(window.location.hash);
+    setView(initial); // eslint-disable-line react-hooks/set-state-in-effect -- hash routing requires reading window.location client-side
+    setMounted(true);
+    if (initial.kind === "new") setPageTitle("New Entry");
+    else if (initial.kind !== "detail" && initial.kind !== "edit") setPageTitle();
     pageview(window.location.hash ? `/${window.location.hash}` : "/");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Listen for back/forward navigation
@@ -99,28 +99,32 @@ export default function Home() {
       </header>
 
       <main className={styles.main}>
-        {view.kind === "list" && (
-          <JournalList onSelect={(id) => navigate({ kind: "detail", id })} />
-        )}
-        {view.kind === "detail" && (
-          <JournalDetail
-            id={view.id}
-            onBack={() => navigate({ kind: "list" })}
-            onEdit={(id) => navigate({ kind: "edit", id })}
-          />
-        )}
-        {view.kind === "new" && (
-          <JournalForm
-            onBack={() => navigate({ kind: "list" })}
-            onSaved={(id) => navigate({ kind: "detail", id })}
-          />
-        )}
-        {view.kind === "edit" && (
-          <JournalForm
-            editId={view.id}
-            onBack={() => navigate({ kind: "detail", id: view.id })}
-            onSaved={(id) => navigate({ kind: "detail", id })}
-          />
+        {!mounted ? null : (
+          <>
+            {view.kind === "list" && (
+              <JournalList onSelect={(id) => navigate({ kind: "detail", id })} />
+            )}
+            {view.kind === "detail" && (
+              <JournalDetail
+                id={view.id}
+                onBack={() => navigate({ kind: "list" })}
+                onEdit={(id) => navigate({ kind: "edit", id })}
+              />
+            )}
+            {view.kind === "new" && (
+              <JournalForm
+                onBack={() => navigate({ kind: "list" })}
+                onSaved={(id) => navigate({ kind: "detail", id })}
+              />
+            )}
+            {view.kind === "edit" && (
+              <JournalForm
+                editId={view.id}
+                onBack={() => navigate({ kind: "detail", id: view.id })}
+                onSaved={(id) => navigate({ kind: "detail", id })}
+              />
+            )}
+          </>
         )}
       </main>
 
