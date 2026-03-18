@@ -95,31 +95,41 @@ Deno.serve(async (req) => {
       { role: "user", parts: [{ text: message }] },
     ];
 
-    const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-          contents,
-          generationConfig: { maxOutputTokens: 256 },
-        }),
-      }
-    );
+    const MODELS = ["gemini-2.5-flash", "gemma-3-4b-it"];
+    const requestBody = JSON.stringify({
+      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+      contents,
+      generationConfig: { maxOutputTokens: 256 },
+    });
 
-    if (!geminiRes.ok) {
-      const errBody = await geminiRes.text();
+    let geminiRes: Response | null = null;
+
+    for (const model of MODELS) {
+      geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: requestBody,
+        }
+      );
+
+      if (geminiRes.ok || geminiRes.status !== 429) break;
+      console.warn(`${model} rate-limited, falling back to next model...`);
+    }
+
+    if (!geminiRes!.ok) {
+      const errBody = await geminiRes!.text();
       console.error("Gemini API error:", errBody);
 
-      if (geminiRes.status === 429) {
+      if (geminiRes!.status === 429) {
         return new Response(
           JSON.stringify({ reply: "My brain's rate-limited — too many thoughts per minute. Try again shortly. ⏳" }),
           { status: 429, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
         );
       }
 
-      if (geminiRes.status === 403) {
+      if (geminiRes!.status === 403) {
         return new Response(
           JSON.stringify({ reply: "I'm locked out of my own brain. API key issue. 🔒" }),
           { status: 502, headers: { ...CORS_HEADERS, "Content-Type": "application/json" } }
@@ -132,7 +142,7 @@ Deno.serve(async (req) => {
       );
     }
 
-    const data = await geminiRes.json();
+    const data = await geminiRes!.json();
 
     // Handle blocked/empty responses
     const candidate = data.candidates?.[0];
