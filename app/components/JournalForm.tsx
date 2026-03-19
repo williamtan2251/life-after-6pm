@@ -74,7 +74,8 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
         .eq("author_id", user.id);
 
       if (error) {
-        alert(error.message);
+        console.error("Journal update failed:", error);
+        alert("Failed to save. Please try again.");
         setSaving(false);
         return;
       }
@@ -93,7 +94,8 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
         .single();
 
       if (error) {
-        alert(error.message);
+        console.error("Journal create failed:", error);
+        alert("Failed to publish. Please try again.");
         setSaving(false);
         return;
       }

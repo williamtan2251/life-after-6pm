@@ -53,7 +53,8 @@ export default function Auth() {
     });
 
     if (error) {
-      setError(error.message);
+      console.error("Sign-in failed:", error);
+      setError("Invalid email or password.");
     } else {
       event("sign_in_success");
     }
@@ -68,6 +69,7 @@ export default function Auth() {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
+        autoComplete="email"
         className={styles.input}
       />
       <input
@@ -77,6 +79,7 @@ export default function Auth() {
         onChange={(e) => setPassword(e.target.value)}
         required
         minLength={8}
+        autoComplete="current-password"
         className={styles.input}
       />
       {error && <p className={styles.error}>{error}</p>}

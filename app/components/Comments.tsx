@@ -57,9 +57,11 @@ export default function Comments({ journalId }: Props) {
   async function handleDelete(commentId: string) {
     if (!confirm("Delete this comment?")) return;
     setDeletingId(commentId);
-    const { error } = await supabase.from("comments").delete().eq("id", commentId);
+    if (!user) return;
+    const { error } = await supabase.from("comments").delete().eq("id", commentId).eq("email", user.email);
     if (error) {
-      alert("Failed to delete: " + error.message);
+      console.error("Comment delete failed:", error);
+      alert("Failed to delete comment.");
       setDeletingId(null);
       return;
     }
@@ -92,7 +94,8 @@ export default function Comments({ journalId }: Props) {
     });
 
     if (error) {
-      alert(error.message);
+      console.error("Comment submit failed:", error);
+      alert("Failed to post comment. Please try again.");
       setSubmitting(false);
       return;
     }

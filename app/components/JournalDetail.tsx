@@ -79,7 +79,8 @@ export default function JournalDetail({ id, onBack, onEdit }: Props) {
     setDeleting(true);
     const { error } = await supabase.from("journals").delete().eq("id", id).eq("author_id", user.id);
     if (error) {
-      alert("Failed to delete: " + error.message);
+      console.error("Journal delete failed:", error);
+      alert("Failed to delete. Please try again.");
       setDeleting(false);
       return;
     }
