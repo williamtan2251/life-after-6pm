@@ -38,23 +38,29 @@ export function trackScrollDepth(
   const thresholds = [25, 50, 75, 100];
   const fired = new Set<number>();
 
+  let ticking = false;
   function onScroll() {
-    const rect = element.getBoundingClientRect();
-    const scrolled = window.innerHeight - rect.top;
-    const total = rect.height;
-    if (total <= 0) return;
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      ticking = false;
+      const rect = element.getBoundingClientRect();
+      const scrolled = window.innerHeight - rect.top;
+      const total = rect.height;
+      if (total <= 0) return;
 
-    const percent = Math.min(100, Math.round((scrolled / total) * 100));
+      const percent = Math.min(100, Math.round((scrolled / total) * 100));
 
-    for (const t of thresholds) {
-      if (percent >= t && !fired.has(t)) {
-        fired.add(t);
-        event("scroll_depth", {
-          journal_id: journalId,
-          depth: t,
-        });
+      for (const t of thresholds) {
+        if (percent >= t && !fired.has(t)) {
+          fired.add(t);
+          event("scroll_depth", {
+            journal_id: journalId,
+            depth: t,
+          });
+        }
       }
-    }
+    });
   }
 
   window.addEventListener("scroll", onScroll, { passive: true });

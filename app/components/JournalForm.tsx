@@ -36,12 +36,14 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
 
   useEffect(() => {
     if (!editId) return;
+    let stale = false;
     supabase
       .from("journals")
       .select("*")
       .eq("id", editId)
       .single()
       .then(({ data, error }) => {
+        if (stale) return;
         if (error) {
           setError("Failed to load journal entry.");
         } else if (data) {
@@ -51,6 +53,7 @@ export default function JournalForm({ editId, onBack, onSaved }: Props) {
         }
         setLoading(false);
       });
+    return () => { stale = true; };
   }, [editId]);
 
   if (!user) return <p>Please sign in.</p>;

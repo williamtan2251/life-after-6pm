@@ -143,8 +143,8 @@ export default function Toolbar({ editor }: ToolbarProps) {
           if (url) {
             try {
               const parsed = new URL(url);
-              if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
-                alert("Only http and https URLs are allowed.");
+              if (parsed.protocol !== "https:") {
+                alert("Only https URLs are allowed.");
                 return;
               }
               editor.chain().focus().setImage({ src: parsed.href }).run();

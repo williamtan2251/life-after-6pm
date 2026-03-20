@@ -12,7 +12,7 @@
 // CREATE POLICY "Allow public insert" ON console_leads FOR INSERT WITH CHECK (true);
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin": "https://williamt.github.io",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };

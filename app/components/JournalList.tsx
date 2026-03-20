@@ -22,11 +22,13 @@ export default function JournalList({ onSelect }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let stale = false;
     supabase
       .from("journals")
       .select("id, title, preview, created_at")
       .order("created_at", { ascending: false })
       .then(({ data, error }) => {
+        if (stale) return;
         if (error) {
           setError("Failed to load journals.");
         } else {
@@ -34,6 +36,7 @@ export default function JournalList({ onSelect }: Props) {
         }
         setLoading(false);
       });
+    return () => { stale = true; };
   }, []);
 
   if (loading) return <p className={styles.empty}>Loading...</p>;

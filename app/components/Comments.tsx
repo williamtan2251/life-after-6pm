@@ -133,7 +133,7 @@ export default function Comments({ journalId }: Props) {
                       minute: "2-digit",
                     })}
                   </time>
-                  {user && (
+                  {user?.email === c.email && (
                     <button
                       className={styles.deleteButton}
                       onClick={() => handleDelete(c.id)}

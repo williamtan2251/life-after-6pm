@@ -42,6 +42,7 @@ async function irc(message: string): Promise<void> {
 
     history.push({ role: "user", content: message });
     history.push({ role: "assistant", content: data.reply });
+    if (history.length > 20) history.splice(0, history.length - 20);
 
     event("console_chat", { message_count: String(history.length / 2) });
 
