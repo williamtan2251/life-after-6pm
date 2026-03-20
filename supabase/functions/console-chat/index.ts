@@ -95,7 +95,7 @@ Deno.serve(async (req) => {
       { role: "user", parts: [{ text: message }] },
     ];
 
-    const MODELS = ["gemini-2.5-flash", "gemma-3-4b-it"];
+    const MODELS = ["gemini-3.1-flash-lite-preview", "gemini-2.5-flash", "gemma-3-4b-it"];
 
     let geminiRes: Response | null = null;
 
