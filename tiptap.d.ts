@@ -2,8 +2,8 @@
 // Webpack aliases in next.config.ts resolve these at build time.
 // These declarations let the TypeScript checker find the types.
 
-declare module "@tiptap/react" {
-  import type { Editor as CoreEditor } from "@tiptap/core";
+declare module '@tiptap/react' {
+  import type { Editor as CoreEditor } from '@tiptap/core';
   export type JSONContent = {
     type?: string;
     attrs?: Record<string, unknown>;
@@ -26,11 +26,11 @@ declare module "@tiptap/react" {
   export type { CoreEditor as Editor };
 }
 
-declare module "@tiptap/core" {
+declare module '@tiptap/core' {
   export interface Editor {
     chain(): ChainedCommands;
     isActive(name: string, attrs?: Record<string, unknown>): boolean;
-    getJSON(): import("@tiptap/react").JSONContent;
+    getJSON(): import('@tiptap/react').JSONContent;
   }
   interface ChainedCommands {
     focus(): ChainedCommands;
@@ -48,12 +48,12 @@ declare module "@tiptap/core" {
   }
 }
 
-declare module "@tiptap/starter-kit" {
+declare module '@tiptap/starter-kit' {
   const StarterKit: unknown;
   export default StarterKit;
 }
 
-declare module "@tiptap/extension-image" {
+declare module '@tiptap/extension-image' {
   const Image: unknown;
   export default Image;
 }

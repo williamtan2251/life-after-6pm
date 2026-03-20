@@ -1,4 +1,4 @@
-type GtagCommand = "config" | "event" | "js";
+type GtagCommand = 'config' | 'event' | 'js';
 
 declare global {
   interface Window {
@@ -8,33 +8,30 @@ declare global {
 }
 
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-const SITE_NAME = "Life After 6PM";
+const SITE_NAME = 'Life After 6PM';
 
 export function setPageTitle(title?: string) {
   document.title = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 }
 
 export function pageview(path: string) {
-  if (!GA_ID || typeof window.gtag !== "function") return;
+  if (!GA_ID || typeof window.gtag !== 'function') return;
   // GA4 strips hash fragments from page_location, so we convert
   // the hash route into a virtual path: /#journal/abc → /journal/abc
-  const hashPath = path.replace(/^\/#?/, "/").replace(/\/+/g, "/");
-  const base = window.location.origin + window.location.pathname.replace(/\/$/, "");
-  window.gtag("event", "page_view", {
+  const hashPath = path.replace(/^\/#?/, '/').replace(/\/+/g, '/');
+  const base = window.location.origin + window.location.pathname.replace(/\/$/, '');
+  window.gtag('event', 'page_view', {
     page_location: base + hashPath,
     page_title: document.title,
   });
 }
 
 export function event(name: string, params?: Record<string, unknown>) {
-  if (!GA_ID || typeof window.gtag !== "function") return;
-  window.gtag("event", name, params);
+  if (!GA_ID || typeof window.gtag !== 'function') return;
+  window.gtag('event', name, params);
 }
 
-export function trackScrollDepth(
-  element: HTMLElement,
-  journalId: string
-): () => void {
+export function trackScrollDepth(element: HTMLElement, journalId: string): () => void {
   const thresholds = [25, 50, 75, 100];
   const fired = new Set<number>();
 
@@ -54,7 +51,7 @@ export function trackScrollDepth(
       for (const t of thresholds) {
         if (percent >= t && !fired.has(t)) {
           fired.add(t);
-          event("scroll_depth", {
+          event('scroll_depth', {
             journal_id: journalId,
             depth: t,
           });
@@ -63,10 +60,10 @@ export function trackScrollDepth(
     });
   }
 
-  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
   onScroll();
 
-  return () => window.removeEventListener("scroll", onScroll);
+  return () => window.removeEventListener('scroll', onScroll);
 }
 
 export function trackReadTime(journalId: string): () => void {
@@ -75,17 +72,17 @@ export function trackReadTime(journalId: string): () => void {
   function sendReadTime() {
     const seconds = Math.round((Date.now() - start) / 1000);
     if (seconds > 0) {
-      event("read_time", {
+      event('read_time', {
         journal_id: journalId,
         seconds,
       });
     }
   }
 
-  window.addEventListener("beforeunload", sendReadTime);
+  window.addEventListener('beforeunload', sendReadTime);
 
   return () => {
-    window.removeEventListener("beforeunload", sendReadTime);
+    window.removeEventListener('beforeunload', sendReadTime);
     sendReadTime();
   };
 }

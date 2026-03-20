@@ -1,5 +1,5 @@
-import { event } from "./analytics";
-import { initConsoleChatbot } from "./console-chatbot";
+import { event } from './analytics';
+import { initConsoleChatbot } from './console-chatbot';
 
 export function initConsoleEasterEgg() {
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="500" height="80" viewBox="0 0 500 80">
@@ -17,27 +17,27 @@ export function initConsoleEasterEgg() {
   const dataUrl = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
 
   console.log(
-    "%c ",
-    `background-image: url('${dataUrl}'); padding: 40px 250px; background-size: 500px 80px; background-repeat: no-repeat; background-position: center;`
+    '%c ',
+    `background-image: url('${dataUrl}'); padding: 40px 250px; background-size: 500px 80px; background-repeat: no-repeat; background-position: center;`,
   );
 
-  event("console_easter_egg");
+  event('console_easter_egg');
 
   console.log(
-    "%c ⚡ I knew you will look at console! ⚡",
-    "color: #FFD700; font-size: 20px; font-weight: bold; text-shadow: 1px 1px 2px #000;"
+    '%c ⚡ I knew you will look at console! ⚡',
+    'color: #FFD700; font-size: 20px; font-weight: bold; text-shadow: 1px 1px 2px #000;',
   );
 
-  const msg = " Want to collaborate? Reach out william.tan2251 at gmail ";
-  const border = "═".repeat(msg.length + 2);
+  const msg = ' Want to collaborate? Reach out william.tan2251 at gmail ';
+  const border = '═'.repeat(msg.length + 2);
   console.log(
     `%c╔${border}╗\n║ ${msg} ║\n╚${border}╝`,
-    "color: #1E90FF; font-size: 13px; font-family: monospace;"
+    'color: #1E90FF; font-size: 13px; font-family: monospace;',
   );
 
   console.log(
     "%c💬 Type irc('hello') to talk to me!",
-    "color: #FFD700; font-size: 14px; font-weight: bold; padding: 4px 0;"
+    'color: #FFD700; font-size: 14px; font-weight: bold; padding: 4px 0;',
   );
 
   initConsoleChatbot();

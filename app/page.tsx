@@ -1,42 +1,46 @@
-"use client";
+'use client';
 
-import { useCallback, useEffect, useState } from "react";
-import Image from "next/image";
-import { useAuth } from "./lib/auth-context";
-import { pageview, event, setPageTitle } from "./lib/analytics";
-import { initConsoleEasterEgg } from "./lib/console-easter-egg";
-import Auth from "./components/Auth";
-import JournalList from "./components/JournalList";
-import JournalDetail from "./components/JournalDetail";
-import JournalForm from "./components/JournalForm";
-import styles from "./page.module.css";
+import { useCallback, useEffect, useState } from 'react';
+import Image from 'next/image';
+import { useAuth } from './lib/auth-context';
+import { pageview, event, setPageTitle } from './lib/analytics';
+import { initConsoleEasterEgg } from './lib/console-easter-egg';
+import Auth from './components/Auth';
+import JournalList from './components/JournalList';
+import JournalDetail from './components/JournalDetail';
+import JournalForm from './components/JournalForm';
+import styles from './page.module.css';
 
 type View =
-  | { kind: "list" }
-  | { kind: "detail"; id: string }
-  | { kind: "new" }
-  | { kind: "edit"; id: string };
+  | { kind: 'list' }
+  | { kind: 'detail'; id: string }
+  | { kind: 'new' }
+  | { kind: 'edit'; id: string };
 
 function parseHash(hash: string): View {
-  const h = hash.replace(/^#\/?/, "");
-  if (h.startsWith("journal/")) return { kind: "detail", id: h.slice(8) };
-  if (h.startsWith("edit/")) return { kind: "edit", id: h.slice(5) };
-  if (h === "new") return { kind: "new" };
-  return { kind: "list" };
+  const h = hash.replace(/^#\/?/, '');
+  if (h.startsWith('journal/')) return { kind: 'detail', id: h.slice(8) };
+  if (h.startsWith('edit/')) return { kind: 'edit', id: h.slice(5) };
+  if (h === 'new') return { kind: 'new' };
+  return { kind: 'list' };
 }
 
 function viewToHash(view: View): string {
   switch (view.kind) {
-    case "detail": return `#journal/${view.id}`;
-    case "edit": return `#edit/${view.id}`;
-    case "new": return "#new";
-    case "list": return "";
+    case 'detail':
+      return `#journal/${view.id}`;
+    case 'edit':
+      return `#edit/${view.id}`;
+    case 'new':
+      return '#new';
+    case 'list':
+      return '';
   }
 }
 
 export default function Home() {
   const { user } = useAuth();
-  const [view, setView] = useState<View>({ kind: "list" });
+  const [view, setView] = useState<View>({ kind: 'list' });
   const [mounted, setMounted] = useState(false);
 
   // Read initial hash on mount — must happen in effect to avoid hydration mismatch
@@ -44,9 +48,9 @@ export default function Home() {
     const initial = parseHash(window.location.hash);
     setView(initial); // eslint-disable-line react-hooks/set-state-in-effect -- hash routing requires reading window.location client-side
     setMounted(true);
-    if (initial.kind === "new") setPageTitle("New Entry");
-    else if (initial.kind !== "detail" && initial.kind !== "edit") setPageTitle();
-    pageview(window.location.hash ? `/${window.location.hash}` : "/");
+    if (initial.kind === 'new') setPageTitle('New Entry');
+    else if (initial.kind !== 'detail' && initial.kind !== 'edit') setPageTitle();
+    pageview(window.location.hash ? `/${window.location.hash}` : '/');
     initConsoleEasterEgg();
   }, []);
 
@@ -54,10 +58,10 @@ export default function Home() {
   useEffect(() => {
     function onHashChange() {
       setView(parseHash(window.location.hash));
-      pageview(window.location.hash ? `/${window.location.hash}` : "/");
+      pageview(window.location.hash ? `/${window.location.hash}` : '/');
     }
-    window.addEventListener("hashchange", onHashChange);
-    return () => window.removeEventListener("hashchange", onHashChange);
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
   }, []);
 
   // Update hash when view changes
@@ -67,29 +71,32 @@ export default function Home() {
       window.location.hash = hash;
     } else {
       // Remove hash without adding history entry for going home
-      history.replaceState(null, "", window.location.pathname);
+      history.replaceState(null, '', window.location.pathname);
       setView(v);
       setPageTitle();
-      pageview("/");
+      pageview('/');
     }
   }, []);
 
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <button
-          onClick={() => navigate({ kind: "list" })}
-          className={styles.title}
-        >
-          <Image src="/life-after-6pm/favicon.svg" alt="" width={24} height={24} className={styles.titleIcon} />
+        <button onClick={() => navigate({ kind: 'list' })} className={styles.title}>
+          <Image
+            src='/life-after-6pm/favicon.svg'
+            alt=''
+            width={24}
+            height={24}
+            className={styles.titleIcon}
+          />
           Life After 6PM
         </button>
         <div className={styles.headerRight}>
-          {user && view.kind === "list" && (
+          {user && view.kind === 'list' && (
             <button
               onClick={() => {
-                event("new_entry_click");
-                navigate({ kind: "new" });
+                event('new_entry_click');
+                navigate({ kind: 'new' });
               }}
               className={styles.newButton}
             >
@@ -103,27 +110,27 @@ export default function Home() {
       <main className={styles.main}>
         {!mounted ? null : (
           <>
-            {view.kind === "list" && (
-              <JournalList onSelect={(id) => navigate({ kind: "detail", id })} />
+            {view.kind === 'list' && (
+              <JournalList onSelect={(id) => navigate({ kind: 'detail', id })} />
             )}
-            {view.kind === "detail" && (
+            {view.kind === 'detail' && (
               <JournalDetail
                 id={view.id}
-                onBack={() => navigate({ kind: "list" })}
-                onEdit={(id) => navigate({ kind: "edit", id })}
+                onBack={() => navigate({ kind: 'list' })}
+                onEdit={(id) => navigate({ kind: 'edit', id })}
               />
             )}
-            {view.kind === "new" && (
+            {view.kind === 'new' && (
               <JournalForm
-                onBack={() => navigate({ kind: "list" })}
-                onSaved={(id) => navigate({ kind: "detail", id })}
+                onBack={() => navigate({ kind: 'list' })}
+                onSaved={(id) => navigate({ kind: 'detail', id })}
               />
             )}
-            {view.kind === "edit" && (
+            {view.kind === 'edit' && (
               <JournalForm
                 editId={view.id}
-                onBack={() => navigate({ kind: "detail", id: view.id })}
-                onSaved={(id) => navigate({ kind: "detail", id })}
+                onBack={() => navigate({ kind: 'detail', id: view.id })}
+                onSaved={(id) => navigate({ kind: 'detail', id })}
               />
             )}
           </>

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEditor, EditorContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
-import Image from "@tiptap/extension-image";
-import type { JSONContent } from "@tiptap/react";
-import Toolbar from "./Toolbar";
-import styles from "./Editor.module.css";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
+import type { JSONContent } from '@tiptap/react';
+import Toolbar from './Toolbar';
+import styles from './Editor.module.css';
 
 interface EditorProps {
   content?: JSONContent;
@@ -13,11 +13,7 @@ interface EditorProps {
   editable?: boolean;
 }
 
-export default function Editor({
-  content,
-  onChange,
-  editable = true,
-}: EditorProps) {
+export default function Editor({ content, onChange, editable = true }: EditorProps) {
   const editor = useEditor({
     extensions: [StarterKit, Image],
     content,

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useEffect, useRef, useState } from "react";
-import { supabase } from "../lib/supabase";
-import { useAuth } from "../lib/auth-context";
-import styles from "./Comments.module.css";
+import { useEffect, useRef, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../lib/auth-context';
+import styles from './Comments.module.css';
 
 const RATE_LIMIT_MS = 30_000;
 const MAX_COMMENT_LENGTH = 2000;
@@ -26,9 +26,9 @@ export default function Comments({ journalId }: Props) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [body, setBody] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [body, setBody] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const lastSubmitRef = useRef(0);
@@ -38,30 +38,36 @@ export default function Comments({ journalId }: Props) {
   useEffect(() => {
     let stale = false;
     supabase
-      .from("comments")
-      .select("*")
-      .eq("journal_id", journalId)
-      .order("created_at", { ascending: false })
+      .from('comments')
+      .select('*')
+      .eq('journal_id', journalId)
+      .order('created_at', { ascending: false })
       .then(({ data, error }) => {
         if (stale) return;
         if (error) {
-          setError("Failed to load comments.");
+          setError('Failed to load comments.');
         } else {
           setComments(data ?? []);
         }
         setLoading(false);
       });
-    return () => { stale = true; };
+    return () => {
+      stale = true;
+    };
   }, [journalId, refreshKey]);
 
   async function handleDelete(commentId: string) {
-    if (!confirm("Delete this comment?")) return;
+    if (!confirm('Delete this comment?')) return;
     setDeletingId(commentId);
     if (!user) return;
-    const { error } = await supabase.from("comments").delete().eq("id", commentId).eq("email", user.email);
+    const { error } = await supabase
+      .from('comments')
+      .delete()
+      .eq('id', commentId)
+      .eq('email', user.email);
     if (error) {
-      console.error("Comment delete failed:", error);
-      alert("Failed to delete comment.");
+      console.error('Comment delete failed:', error);
+      alert('Failed to delete comment.');
       setDeletingId(null);
       return;
     }
@@ -69,9 +75,9 @@ export default function Comments({ journalId }: Props) {
     setRefreshKey((k) => k + 1);
   }
 
-  const displayName = user?.user_metadata?.display_name || user?.email?.split("@")[0] || "Author";
-  const effectiveName = user ? (name.trim() || displayName) : name.trim();
-  const effectiveEmail = user ? (user.email ?? "") : email.trim();
+  const displayName = user?.user_metadata?.display_name || user?.email?.split('@')[0] || 'Author';
+  const effectiveName = user ? name.trim() || displayName : name.trim();
+  const effectiveEmail = user ? (user.email ?? '') : email.trim();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -79,14 +85,14 @@ export default function Comments({ journalId }: Props) {
 
     const now = Date.now();
     if (now - lastSubmitRef.current < RATE_LIMIT_MS) {
-      alert("Please wait before posting another comment.");
+      alert('Please wait before posting another comment.');
       return;
     }
 
     setSubmitting(true);
     lastSubmitRef.current = now;
 
-    const { error } = await supabase.from("comments").insert({
+    const { error } = await supabase.from('comments').insert({
       journal_id: journalId,
       name: effectiveName,
       email: effectiveEmail,
@@ -94,13 +100,13 @@ export default function Comments({ journalId }: Props) {
     });
 
     if (error) {
-      console.error("Comment submit failed:", error);
-      alert("Failed to post comment. Please try again.");
+      console.error('Comment submit failed:', error);
+      alert('Failed to post comment. Please try again.');
       setSubmitting(false);
       return;
     }
 
-    setBody("");
+    setBody('');
     setSubmitting(false);
     setRefreshKey((k) => k + 1);
   }
@@ -125,12 +131,12 @@ export default function Comments({ journalId }: Props) {
                 <strong>{c.name}</strong>
                 <div className={styles.commentMeta}>
                   <time className={styles.commentDate}>
-                    {new Date(c.created_at).toLocaleDateString("en-US", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                      hour: "numeric",
-                      minute: "2-digit",
+                    {new Date(c.created_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                      hour: 'numeric',
+                      minute: '2-digit',
                     })}
                   </time>
                   {user?.email === c.email && (
@@ -140,7 +146,7 @@ export default function Comments({ journalId }: Props) {
                       disabled={deletingId === c.id}
                       style={{ opacity: deletingId === c.id ? 0.5 : 1 }}
                     >
-                      {deletingId === c.id ? "Deleting..." : "Delete"}
+                      {deletingId === c.id ? 'Deleting...' : 'Delete'}
                     </button>
                   )}
                 </div>
@@ -156,22 +162,26 @@ export default function Comments({ journalId }: Props) {
           <p className={styles.commentAs}>Commenting as {displayName}</p>
         ) : (
           <div className={styles.formRow}>
-            <label className={styles.srOnly} htmlFor="comment-name">Name</label>
+            <label className={styles.srOnly} htmlFor='comment-name'>
+              Name
+            </label>
             <input
-              id="comment-name"
-              type="text"
-              placeholder="Name"
+              id='comment-name'
+              type='text'
+              placeholder='Name'
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
               maxLength={MAX_NAME_LENGTH}
               className={styles.input}
             />
-            <label className={styles.srOnly} htmlFor="comment-email">Email</label>
+            <label className={styles.srOnly} htmlFor='comment-email'>
+              Email
+            </label>
             <input
-              id="comment-email"
-              type="email"
-              placeholder="Email"
+              id='comment-email'
+              type='email'
+              placeholder='Email'
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -179,10 +189,12 @@ export default function Comments({ journalId }: Props) {
             />
           </div>
         )}
-        <label className={styles.srOnly} htmlFor="comment-body">Comment</label>
+        <label className={styles.srOnly} htmlFor='comment-body'>
+          Comment
+        </label>
         <textarea
-          id="comment-body"
-          placeholder="Write a comment..."
+          id='comment-body'
+          placeholder='Write a comment...'
           value={body}
           onChange={(e) => setBody(e.target.value)}
           required
@@ -191,11 +203,11 @@ export default function Comments({ journalId }: Props) {
           className={styles.textarea}
         />
         <button
-          type="submit"
+          type='submit'
           disabled={submitting || !effectiveName || !effectiveEmail || !body.trim()}
           className={styles.submitButton}
         >
-          {submitting ? "Posting..." : "Post Comment"}
+          {submitting ? 'Posting...' : 'Post Comment'}
         </button>
       </form>
     </section>

@@ -23,22 +23,22 @@ Users can create and manage journal entries using a rich text editor. Entries ar
 
 ## Tech Stack
 
-| Layer            | Technology                          |
-| ---------------- | ----------------------------------- |
-| Framework        | Next.js (App Router)                |
-| Runtime          | Bun                                 |
-| Language         | TypeScript                          |
-| Styling          | CSS Modules                         |
-| Authentication   | Supabase Auth                       |
-| Database         | Supabase PostgreSQL                 |
-| Rich Text Editor | Tiptap                              |
-| Deployment       | GitHub Pages (static export)        |
+| Layer            | Technology                   |
+| ---------------- | ---------------------------- |
+| Framework        | Next.js (App Router)         |
+| Runtime          | Bun                          |
+| Language         | TypeScript                   |
+| Styling          | CSS Modules                  |
+| Authentication   | Supabase Auth                |
+| Database         | Supabase PostgreSQL          |
+| Rich Text Editor | Tiptap                       |
+| Deployment       | GitHub Pages (static export) |
 
 ## Rich Text Editor Requirements
 
 The editor must support the following formatting options:
 
-- **Bold** and *italic* text
+- **Bold** and _italic_ text
 - 3 heading levels (H1, H2, H3) plus normal body text
 - Inline `code` and fenced code blocks
 - Unordered (bullet) lists and ordered (numbered) lists
@@ -50,15 +50,15 @@ Journal content is stored as Tiptap JSON in Supabase PostgreSQL.
 
 ### `journals` Table
 
-| Column       | Type           | Description                          |
-| ------------ | -------------- | ------------------------------------ |
-| `id`         | UUID (PK)      | Unique identifier (auto-generated)   |
-| `title`      | TEXT           | Journal entry title                  |
-| `content`    | JSONB          | Tiptap JSON content                  |
-| `preview`    | TEXT           | Plain text preview (~200 chars)      |
-| `created_at` | TIMESTAMPTZ    | Auto-set on creation                 |
-| `updated_at` | TIMESTAMPTZ    | Auto-set on creation                 |
-| `author_id`  | UUID (FK)      | References auth.users(id)            |
+| Column       | Type        | Description                        |
+| ------------ | ----------- | ---------------------------------- |
+| `id`         | UUID (PK)   | Unique identifier (auto-generated) |
+| `title`      | TEXT        | Journal entry title                |
+| `content`    | JSONB       | Tiptap JSON content                |
+| `preview`    | TEXT        | Plain text preview (~200 chars)    |
+| `created_at` | TIMESTAMPTZ | Auto-set on creation               |
+| `updated_at` | TIMESTAMPTZ | Auto-set on creation               |
+| `author_id`  | UUID (FK)   | References auth.users(id)          |
 
 ### Row-Level Security
 
