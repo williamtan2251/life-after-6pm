@@ -5,38 +5,13 @@ import Image from 'next/image';
 import { useAuth } from './lib/auth-context';
 import { pageview, event, setPageTitle } from './lib/analytics';
 import { initConsoleEasterEgg } from './lib/console-easter-egg';
+import { parseHash, viewToHash } from './lib/routing';
+import type { View } from './lib/routing';
 import Auth from './components/Auth';
 import JournalList from './components/JournalList';
 import JournalDetail from './components/JournalDetail';
 import JournalForm from './components/JournalForm';
 import styles from './page.module.css';
-
-type View =
-  | { kind: 'list' }
-  | { kind: 'detail'; id: string }
-  | { kind: 'new' }
-  | { kind: 'edit'; id: string };
-
-function parseHash(hash: string): View {
-  const h = hash.replace(/^#\/?/, '');
-  if (h.startsWith('journal/')) return { kind: 'detail', id: h.slice(8) };
-  if (h.startsWith('edit/')) return { kind: 'edit', id: h.slice(5) };
-  if (h === 'new') return { kind: 'new' };
-  return { kind: 'list' };
-}
-
-function viewToHash(view: View): string {
-  switch (view.kind) {
-    case 'detail':
-      return `#journal/${view.id}`;
-    case 'edit':
-      return `#edit/${view.id}`;
-    case 'new':
-      return '#new';
-    case 'list':
-      return '';
-  }
-}
 
 export default function Home() {
   const { user } = useAuth();

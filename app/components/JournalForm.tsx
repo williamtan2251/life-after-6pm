@@ -4,18 +4,9 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../lib/auth-context';
 import Editor from './Editor';
+import { extractPreview } from '../lib/extract-preview';
 import type { JSONContent } from '@tiptap/react';
 import styles from './JournalForm.module.css';
-
-function extractPreview(json: JSONContent): string {
-  let text = '';
-  function walk(node: JSONContent) {
-    if (node.text) text += node.text;
-    if (node.content) node.content.forEach(walk);
-  }
-  walk(json);
-  return text.slice(0, 200);
-}
 
 interface Props {
   editId?: string;
